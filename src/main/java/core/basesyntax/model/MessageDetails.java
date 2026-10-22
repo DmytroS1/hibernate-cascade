@@ -1,9 +1,11 @@
 package core.basesyntax.model;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
 
+@Entity
 public class MessageDetails {
     private Long id;
     private String sender;

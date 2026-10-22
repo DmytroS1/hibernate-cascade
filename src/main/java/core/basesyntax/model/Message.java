@@ -1,8 +1,10 @@
 package core.basesyntax.model;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
 import jakarta.persistence.OneToOne;
 
+@Entity
 public class Message {
     private Long id;
     private String content;
