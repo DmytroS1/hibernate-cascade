@@ -1,11 +1,16 @@
 package core.basesyntax.model;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.OneToMany;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class User {
     private Long id;
     private String username;
-    private List<Comment> comments;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.MERGE)
+    private List<Comment> comments = new ArrayList<>();
 
     public Long getId() {
         return id;
