@@ -6,16 +6,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "Messages")
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String content;
-    @OneToOne(mappedBy = "message", cascade = {CascadeType.MERGE,
-            CascadeType.PERSIST, CascadeType.REMOVE})
-    private MessageDetails messageDetails = new MessageDetails();
+    @OneToOne(cascade = CascadeType.ALL)
+    private MessageDetails messageDetails;
 
     public Long getId() {
         return id;

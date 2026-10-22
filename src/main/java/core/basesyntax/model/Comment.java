@@ -1,31 +1,22 @@
 package core.basesyntax.model;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import java.util.ArrayList;
+import jakarta.persistence.Table;
 import java.util.List;
 
 @Entity
+@Table(name = "Comments")
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @OneToMany(mappedBy = "comment", cascade = {CascadeType.MERGE,
-            CascadeType.PERSIST})
-    private List<Smile> smiles = new ArrayList<>();
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
     private String content;
+    @OneToMany
+    private List<Smile> smiles;
 
     public Long getId() {
         return id;

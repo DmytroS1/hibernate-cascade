@@ -4,8 +4,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,13 +13,6 @@ public class MessageDetails {
     private Long id;
     private String sender;
     private LocalDateTime sentTime;
-
-    @OneToOne
-    @JoinColumn(name = "message_id")
-    private Message message;
-
-    public MessageDetails() {
-    }
 
     public Long getId() {
         return id;

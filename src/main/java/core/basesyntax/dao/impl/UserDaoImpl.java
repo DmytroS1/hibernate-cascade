@@ -6,6 +6,7 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
 public class UserDaoImpl extends AbstractDao implements UserDao {
     public UserDaoImpl(SessionFactory sessionFactory) {
@@ -17,15 +18,15 @@ public class UserDaoImpl extends AbstractDao implements UserDao {
         Session session = null;
         Transaction transaction = null;
         try {
-            session = sessionFactory.openSession();
+            session = factory.openSession();
             transaction = session.beginTransaction();
             session.persist(entity);
             transaction.commit();
-        } catch (Exception e) {
+        } catch (Exception ex) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            throw new RuntimeException("Can't create " + entity.getClass().getSimpleName(), e);
+            throw new RuntimeException("Can't create user: " + entity, ex);
         } finally {
             if (session != null) {
                 session.close();
@@ -36,65 +37,42 @@ public class UserDaoImpl extends AbstractDao implements UserDao {
 
     @Override
     public User get(Long id) {
-        try (Session session = sessionFactory.openSession()) {
-            User user = session.createQuery(
-                            "SELECT u FROM User u "
-                                    + "LEFT JOIN FETCH u.comments "
-                                    + "WHERE u.id = :id",
-                            User.class)
-                    .setParameter("id", id)
-                    .uniqueResult();
-
-            if (user == null) {
-                throw new RuntimeException("User not found with id " + id);
-            }
-
-            return user;
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new RuntimeException("Can't find user by id " + id, e);
+        try (Session session = factory.openSession()) {
+            return session.get(User.class, id);
+        } catch (Exception ex) {
+            throw new RuntimeException("Can't get a user with id: " + id, ex);
         }
     }
 
     @Override
     public List<User> getAll() {
-        Session session = null;
-        Transaction transaction = null;
-        List<User> userList = null;
-        try {
-            session = sessionFactory.openSession();
-            transaction = session.beginTransaction();
-            userList = session.createQuery("FROM User", User.class).getResultList();
-            transaction.commit();
-        } catch (Exception e) {
-            throw new RuntimeException("Can't get all elements from DB ", e);
-        } finally {
-            if (session != null) {
-                session.close();
-            }
+        try (Session session = factory.openSession()) {
+            Query<User> getAllUsersQuery = session.createQuery(
+                    "from User", User.class);
+            return getAllUsersQuery.getResultList();
+        } catch (Exception ex) {
+            throw new RuntimeException("Can't get users", ex);
         }
-        return userList;
     }
 
     @Override
     public void remove(User entity) {
+        Session session = null;
         Transaction transaction = null;
-
-        try (Session session = sessionFactory.openSession()) {
+        try {
+            session = factory.openSession();
             transaction = session.beginTransaction();
-
-            User user = session.get(User.class, entity.getId());
-            if (user != null) {
-                session.remove(user);
-            }
-
+            session.remove(entity);
             transaction.commit();
-        } catch (Exception e) {
+        } catch (Exception ex) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            throw new RuntimeException("Can't remove user " + entity, e);
+            throw new RuntimeException("Can't remove user: " + entity, ex);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
         }
     }
 }

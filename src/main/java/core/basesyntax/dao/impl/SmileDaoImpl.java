@@ -2,6 +2,8 @@ package core.basesyntax.dao.impl;
 
 import core.basesyntax.dao.SmileDao;
 import core.basesyntax.model.Smile;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
 import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -17,15 +19,15 @@ public class SmileDaoImpl extends AbstractDao implements SmileDao {
         Session session = null;
         Transaction transaction = null;
         try {
-            session = sessionFactory.openSession();
+            session = factory.openSession();
             transaction = session.beginTransaction();
             session.persist(entity);
             transaction.commit();
-        } catch (Exception e) {
+        } catch (Exception ex) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            throw new RuntimeException("Can't create " + entity.getClass().getSimpleName(), e);
+            throw new RuntimeException("Can't get a smile with id:", ex);
         } finally {
             if (session != null) {
                 session.close();
@@ -36,30 +38,22 @@ public class SmileDaoImpl extends AbstractDao implements SmileDao {
 
     @Override
     public Smile get(Long id) {
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = factory.openSession()) {
             return session.get(Smile.class, id);
-        } catch (Exception e) {
-            throw new RuntimeException("Can't get smile by id " + id, e);
+        } catch (Exception ex) {
+            throw new RuntimeException("Can't get a smile with id: " + id, ex);
         }
     }
 
     @Override
     public List<Smile> getAll() {
-        Session session = null;
-        Transaction transaction = null;
-        List<Smile> smileList = null;
-        try {
-            session = sessionFactory.openSession();
-            transaction = session.beginTransaction();
-            smileList = session.createQuery("FROM Smile", Smile.class).getResultList();
-            transaction.commit();
-        } catch (Exception e) {
-            throw new RuntimeException("Can't get all smile elements from DB ", e);
-        } finally {
-            if (session != null) {
-                session.close();
-            }
+        try (Session session = factory.openSession()) {
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<Smile> criteria = builder.createQuery(Smile.class);
+            criteria.from(Smile.class);
+            return session.createQuery(criteria).getResultList();
+        } catch (Exception ex) {
+            throw new RuntimeException("Can't get smiles", ex);
         }
-        return smileList;
     }
 }

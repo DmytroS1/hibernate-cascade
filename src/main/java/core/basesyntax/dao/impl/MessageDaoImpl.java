@@ -2,6 +2,8 @@ package core.basesyntax.dao.impl;
 
 import core.basesyntax.dao.MessageDao;
 import core.basesyntax.model.Message;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
 import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -17,16 +19,14 @@ public class MessageDaoImpl extends AbstractDao implements MessageDao {
         Session session = null;
         Transaction transaction = null;
         try {
-            session = sessionFactory.openSession();
+            session = factory.openSession();
             transaction = session.beginTransaction();
             session.persist(entity);
             transaction.commit();
-        } catch (Exception e) {
+        } catch (Exception ex) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            throw new RuntimeException("Can't create a message "
-                    + entity.getClass().getSimpleName(), e);
         } finally {
             if (session != null) {
                 session.close();
@@ -37,31 +37,23 @@ public class MessageDaoImpl extends AbstractDao implements MessageDao {
 
     @Override
     public Message get(Long id) {
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = factory.openSession()) {
             return session.get(Message.class, id);
-        } catch (Exception e) {
-            throw new RuntimeException("Can't find message by id " + id, e);
+        } catch (Exception ex) {
+            throw new RuntimeException("Can;t get a message with id: " + id, ex);
         }
     }
 
     @Override
     public List<Message> getAll() {
-        Session session = null;
-        Transaction transaction = null;
-        List<Message> messagesList = null;
-        try {
-            session = sessionFactory.openSession();
-            transaction = session.beginTransaction();
-            messagesList = session.createQuery("FROM Message", Message.class).getResultList();
-            transaction.commit();
-        } catch (Exception e) {
-            throw new RuntimeException("Can't get all elements from DB", e);
-        } finally {
-            if (session != null) {
-                session.close();
-            }
+        try (Session session = factory.openSession()) {
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<Message> criteria = builder.createQuery(Message.class);
+            criteria.from(Message.class);
+            return session.createQuery(criteria).getResultList();
+        } catch (Exception ex) {
+            throw new RuntimeException("Can't get messages", ex);
         }
-        return messagesList;
     }
 
     @Override
@@ -69,15 +61,15 @@ public class MessageDaoImpl extends AbstractDao implements MessageDao {
         Session session = null;
         Transaction transaction = null;
         try {
-            session = sessionFactory.openSession();
+            session = factory.openSession();
             transaction = session.beginTransaction();
             session.remove(entity);
             transaction.commit();
-        } catch (Exception e) {
+        } catch (Exception ex) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            throw new RuntimeException("Can't remove the message from DB " + entity, e);
+            throw new RuntimeException("Can't remove message: " + entity, ex);
         } finally {
             if (session != null) {
                 session.close();
