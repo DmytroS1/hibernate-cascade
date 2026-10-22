@@ -6,7 +6,8 @@ import jakarta.persistence.OneToOne;
 public class Message {
     private Long id;
     private String content;
-    @OneToOne(mappedBy = "message", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE})
+    @OneToOne(mappedBy = "message", cascade = {CascadeType.MERGE,
+            CascadeType.PERSIST, CascadeType.REMOVE})
     private MessageDetails messageDetails = new MessageDetails();
 
     public Long getId() {

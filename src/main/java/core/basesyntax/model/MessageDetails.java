@@ -2,7 +2,6 @@ package core.basesyntax.model;
 
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
-
 import java.time.LocalDateTime;
 
 public class MessageDetails {

@@ -2,7 +2,6 @@ package core.basesyntax.model;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.OneToMany;
-
 import java.util.ArrayList;
 import java.util.List;
 
