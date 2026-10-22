@@ -17,7 +17,8 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.MERGE)
+    @OneToMany(mappedBy = "comment", cascade = {CascadeType.MERGE,
+            CascadeType.PERSIST})
     private List<Smile> smiles = new ArrayList<>();
 
     @ManyToOne
